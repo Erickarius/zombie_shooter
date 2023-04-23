@@ -2,10 +2,13 @@ import sys
 
 import pygame
 
+import random
+
 from soldier import Soldier
 from settings_zombie_shooter import Settings
 from soldier_bullet import Bullet
 from zombie import Zombie
+from zombie_hand import ZombieHand
 
 class ZombieShooter():
 
@@ -22,8 +25,10 @@ class ZombieShooter():
 		self.bullets = pygame.sprite.Group()
 
 		self.zombies = pygame.sprite.Group() 
+		self.zombiehands = pygame.sprite.Group()
 
 		self._create_zombie_group()
+		self._create_zombiehand_group()
 
 	def run_game(self):
 
@@ -105,15 +110,27 @@ class ZombieShooter():
 	    zombie.rect.y = margin_y + (zombie_height + margin_y) * row_number
 	    self.zombies.add(zombie)
 
+	def _create_zombiehand_group(self):
+	    for i in range(10):
+	        zombiehand = ZombieHand(self)
+	        zombiehand_width, zombiehand_height = zombiehand.rect.size
+	        zombiehand.x = random.randint(zombiehand_width, self.settings.screen_width - zombiehand_width)
+	        zombiehand.rect.x = zombiehand.x
+	        zombiehand.rect.y = random.randint(zombiehand_height, self.settings.screen_height - zombiehand_height)
+	        self.zombiehands.add(zombiehand)
+
+
 
 	def _update_screen(self):
 		self.screen.fill(self.settings.bg_color)
+		self.zombiehands.draw(self.screen)
+		self.zombies.draw(self.screen)
 		self.soldier.blitme()
+
+
 
 		for bullet in self.bullets.sprites():
 			bullet.draw_bullet()
-
-		self.zombies.draw(self.screen)
 
 		pygame.display.flip()
 
