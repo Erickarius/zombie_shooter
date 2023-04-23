@@ -9,8 +9,7 @@ class Zombie(Sprite):
 		self.image = pygame.image.load('images/zombie.bmp')
 		self.rect = self.image.get_rect()
 
-		self.rect.x = self.rect.height
-		self.rect.y = self.rect.width
+		self.rect.x = self.screen.get_width() - self.rect.width
+		self.rect.y = 0
 
-		#Przechowywanie dokładnego poziomu położenia obceg.
 		self.y = float(self.rect.y)

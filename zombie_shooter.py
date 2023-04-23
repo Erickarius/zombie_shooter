@@ -81,28 +81,30 @@ class ZombieShooter():
 				self.bullets.remove(bullet)
 
 	def _create_zombie_group(self):
+	    zombie = Zombie(self)
+	    zombie_width, zombie_height = zombie.rect.size
+	    available_space_x = (self.settings.screen_width - (2 * zombie_width) 
+	    	- self.soldier.rect.height - 1)
+	    number_zombies_x = available_space_x // (2 * zombie_width)
 
-		zombie = Zombie(self)
-		zombie_width, zombie_height = zombie.rect.size
-		available_space_y = self.settings.screen_height - (2 * zombie_height)
-		number_zombie_y = available_space_y // (2 * zombie_height)
+	    number_rows = 5  # zwiększenie liczby rzędów o 1
+	    available_space_y = (self.settings.screen_height - 
+	    	(number_rows * zombie_height))
+	    margin_y = available_space_y // (number_rows + 1)
 
-		soldier_width = self.soldier.rect.width
-		available_space_x = (self.settings.screen_width - (3 * zombie_width) 
-			- soldier_width)
-		number_row = available_space_x // (2 * zombie_width)
+	    for row_number in range(number_rows):
+	        for zombie_number in range(number_zombies_x):
+	            self._create_zombie(zombie_number, row_number, margin_y)
 
-		for row_number in range(number_row):
-			for zombie_number in range(number_zombie_y):
-				self._create_zombie(zombie_number, row_number)
+	def _create_zombie(self, zombie_number, row_number, margin_y):
+	    zombie = Zombie(self)
+	    zombie_width, zombie_height = zombie.rect.size
+	    zombie.x = (self.settings.screen_width - zombie_width - 
+	    	(2 * zombie_width * zombie_number))
+	    zombie.rect.x = zombie.x
+	    zombie.rect.y = margin_y + (zombie_height + margin_y) * row_number
+	    self.zombies.add(zombie)
 
-	def _create_zombie(self, zombie_number, row_number):
-		zombie = Zombie(self)
-		zombie_height = zombie.rect.height
-		zombie.y = zombie_height + 2 * zombie_height * zombie_number
-		zombie.rect.y = zombie.y
-		zombie.rect.x = zombie.rect.width + 2 * zombie.rect.width * row_number
-		self.zombies.add(zombie)
 
 	def _update_screen(self):
 		self.screen.fill(self.settings.bg_color)
@@ -116,5 +118,5 @@ class ZombieShooter():
 		pygame.display.flip()
 
 if __name__ == '__main__':
-	soldier = ZombieShooter()
-	soldier.run_game()
+	zs = ZombieShooter()
+	zs.run_game()
