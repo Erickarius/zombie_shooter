@@ -2,11 +2,11 @@ import pygame
 
 class Soldier():
 
-	def __init__(self, soldier):
+	def __init__(self, zs_game):
 
-		self.screen = soldier.screen
-		self.settings = soldier.settings
-		self.screen_rect = soldier.screen.get_rect()
+		self.screen = zs_game.screen
+		self.settings = zs_game.settings
+		self.screen_rect = zs_game.screen.get_rect()
 
 		self.image = pygame.image.load('images/soldier.bmp')
 		self.rect = self.image.get_rect()

@@ -2,15 +2,15 @@ import pygame
 from pygame.sprite import Sprite
 
 class Bullet(Sprite):
-	def __init__(self, soldier):
+	def __init__(self, zs_game):
 		super().__init__()
-		self.screen = soldier.screen
-		self.settings = soldier.settings
+		self.screen = zs_game.screen
+		self.settings = zs_game.settings
 		self.color = self.settings.bullet_color
 
 		self.rect = pygame.Rect(0, 0, self.settings.bullet_width, 
 			self.settings.bullet_height)
-		self.rect.midright = soldier.soldier.rect.midright
+		self.rect.midright = zs_game.soldier.rect.midright
 
 		self.x = float(self.rect.x)
 
