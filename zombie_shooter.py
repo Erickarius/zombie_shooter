@@ -80,6 +80,7 @@ class ZombieShooter():
 			self.bullets.add(new_bullet)
 
 	def _update_bullets(self):
+		self._check_group_edges()
 		self.bullets.update()
 
 		for bullet in self.bullets.copy():
@@ -90,30 +91,41 @@ class ZombieShooter():
 		self.zombies.update()
 
 	def _create_zombie_group(self):
-		zombie = Zombie(self)
-		zombie_width, zombie_height = zombie.rect.size
-		available_space_x = (self.settings.screen_width - (2 * zombie_width) 
-		    - self.soldier.rect.height - 1)
-		number_zombies_x = available_space_x // (2 * zombie_width // 1)
-
-		number_rows = 4
-		available_space_y = (self.settings.screen_height - 
-		    (number_rows * zombie_height))
-		margin_y = available_space_y // (number_rows + 2)  # umieszczenie zombiaków bliżej górnej krawędzi ekranu
-
-		for row_number in range(number_rows):
-		    for zombie_number in range(number_zombies_x):
-		        self._create_zombie(zombie_number, row_number, margin_y + zombie_height)  # dodanie marginesu do pozycji Y każdego zombiaka
-
-
-	def _create_zombie(self, zombie_number, row_number, margin_y):
 	    zombie = Zombie(self)
 	    zombie_width, zombie_height = zombie.rect.size
-	    zombie.x = (self.settings.screen_width - zombie_width -
-	        (2 * zombie_width * zombie_number))
+
+	    available_space_x = self.settings.screen_width - (2 * zombie_width)
+	    number_zombies_x = available_space_x // (2 * zombie_height)
+	    
+	    soldier_width = self.soldier.rect.height
+	    available_space_y = (self.settings.screen_width- (2 * zombie_width)
+	                         - soldier_width)
+
+	    number_row = available_space_y // (2 * zombie_width)
+
+	    for row_number in range(number_row):
+	        for zombie_number in range(number_zombies_x):
+	            self._create_zombie(zombie_number, row_number)
+
+
+	def _create_zombie(self, zombie_number, row_number):
+	    zombie = Zombie(self)
+	    zombie_height = zombie.rect.height
+	    zombie.x = self.settings.screen_width - (zombie_height + 2 * zombie_height * zombie_number)
 	    zombie.rect.x = zombie.x
-	    zombie.rect.y = margin_y//3 + (zombie_height + margin_y//2) * row_number
+	    zombie.rect.y = zombie.rect.height + 2 * zombie.rect.height * row_number
 	    self.zombies.add(zombie)
+
+	def _check_group_edges(self):
+		for zombie in self.zombies.sprites():
+			if zombie.check_edges():
+				self._change_group_direction()
+				break
+
+	def _change_group_direction(self):
+		for zombie in self.zombies.sprites():
+			zombie.rect.y += self.settings.zombies_drop_speed
+		self.settings.zombies_direction *= -1
 
 	def _create_zombiehand_group(self):
 	    for i in range(10):
