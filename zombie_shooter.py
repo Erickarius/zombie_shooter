@@ -36,6 +36,7 @@ class ZombieShooter():
 			self._check_screen()
 			self.soldier.update()
 			self._update_bullets()
+			self._update_zombies()
 			self._update_screen()
 
 	def _check_screen(self):
@@ -85,6 +86,9 @@ class ZombieShooter():
 			if bullet.rect.right > 1200:
 				self.bullets.remove(bullet)
 
+	def _update_zombies(self):
+		self.zombies.update()
+
 	def _create_zombie_group(self):
 	    zombie = Zombie(self)
 	    zombie_width, zombie_height = zombie.rect.size
@@ -110,13 +114,33 @@ class ZombieShooter():
 	    zombie.rect.y = margin_y + (zombie_height + margin_y) * row_number
 	    self.zombies.add(zombie)
 
+	def _check_zombies_edges(self):
+		for zombie in self.zombies.sprites():
+			if alien.check_edges():
+				self._change_zombies_direction()
+				break
+	def _change_zombies_direction(self):
+		for zombie in self.zombies.sprites():
+			zombie.rect.x -= self.settings.zombies_drop_speed
+		self.settings.zombies_direction *= -1
+
 	def _create_zombiehand_group(self):
 	    for i in range(10):
 	        zombiehand = ZombieHand(self)
 	        zombiehand_width, zombiehand_height = zombiehand.rect.size
-	        zombiehand.x = random.randint(zombiehand_width, self.settings.screen_width - zombiehand_width)
-	        zombiehand.rect.x = zombiehand.x
-	        zombiehand.rect.y = random.randint(zombiehand_height, self.settings.screen_height - zombiehand_height)
+	        
+	        # Losuj pozycję, dopóki nie znajdziesz wolnego miejsca
+	        while True:
+	            zombiehand.x = random.randint(zombiehand_width, 
+	                self.settings.screen_width - zombiehand_width)
+	            zombiehand.rect.x = zombiehand.x
+	            zombiehand.rect.y = random.randint(zombiehand_height, 
+	                self.settings.screen_height - zombiehand_height)
+	                
+	            # Sprawdź, czy nowo wylosowana pozycja koliduje z innym obiektem
+	            if not pygame.sprite.spritecollide(zombiehand, self.zombies, False) and not pygame.sprite.spritecollide(zombiehand, self.zombiehands, False):
+	                break
+	                
 	        self.zombiehands.add(zombiehand)
 
 
