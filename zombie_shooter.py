@@ -107,7 +107,6 @@ class ZombieShooter():
 	        for zombie_number in range(number_zombies_x):
 	            self._create_zombie(zombie_number, row_number)
 
-
 	def _create_zombie(self, zombie_number, row_number):
 	    zombie = Zombie(self)
 	    zombie_height = zombie.rect.height
@@ -132,7 +131,6 @@ class ZombieShooter():
 	        zombiehand = ZombieHand(self)
 	        zombiehand_width, zombiehand_height = zombiehand.rect.size
 	        
-	        # Losuj pozycję, dopóki nie znajdziesz wolnego miejsca
 	        while True:
 	            zombiehand.x = random.randint(zombiehand_width, 
 	                self.settings.screen_width - zombiehand_width)
@@ -152,8 +150,6 @@ class ZombieShooter():
 		self.zombiehands.draw(self.screen)
 		self.zombies.draw(self.screen)
 		self.soldier.blitme()
-
-
 
 		for bullet in self.bullets.sprites():
 			bullet.draw_bullet()
