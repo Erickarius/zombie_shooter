@@ -90,39 +90,30 @@ class ZombieShooter():
 		self.zombies.update()
 
 	def _create_zombie_group(self):
-	    zombie = Zombie(self)
-	    zombie_width, zombie_height = zombie.rect.size
-	    available_space_x = (self.settings.screen_width - (2 * zombie_width) 
-	    	- self.soldier.rect.height - 1)
-	    number_zombies_x = available_space_x // (2 * zombie_width)
+		zombie = Zombie(self)
+		zombie_width, zombie_height = zombie.rect.size
+		available_space_x = (self.settings.screen_width - (2 * zombie_width) 
+		    - self.soldier.rect.height - 1)
+		number_zombies_x = available_space_x // (2 * zombie_width // 1)
 
-	    number_rows = 5  # zwiększenie liczby rzędów o 1
-	    available_space_y = (self.settings.screen_height - 
-	    	(number_rows * zombie_height))
-	    margin_y = available_space_y // (number_rows + 1)
+		number_rows = 4
+		available_space_y = (self.settings.screen_height - 
+		    (number_rows * zombie_height))
+		margin_y = available_space_y // (number_rows + 2)  # umieszczenie zombiaków bliżej górnej krawędzi ekranu
 
-	    for row_number in range(number_rows):
-	        for zombie_number in range(number_zombies_x):
-	            self._create_zombie(zombie_number, row_number, margin_y)
+		for row_number in range(number_rows):
+		    for zombie_number in range(number_zombies_x):
+		        self._create_zombie(zombie_number, row_number, margin_y + zombie_height)  # dodanie marginesu do pozycji Y każdego zombiaka
+
 
 	def _create_zombie(self, zombie_number, row_number, margin_y):
 	    zombie = Zombie(self)
 	    zombie_width, zombie_height = zombie.rect.size
-	    zombie.x = (self.settings.screen_width - zombie_width - 
-	    	(2 * zombie_width * zombie_number))
+	    zombie.x = (self.settings.screen_width - zombie_width -
+	        (2 * zombie_width * zombie_number))
 	    zombie.rect.x = zombie.x
-	    zombie.rect.y = margin_y + (zombie_height + margin_y) * row_number
+	    zombie.rect.y = margin_y//3 + (zombie_height + margin_y//2) * row_number
 	    self.zombies.add(zombie)
-
-	def _check_zombies_edges(self):
-		for zombie in self.zombies.sprites():
-			if alien.check_edges():
-				self._change_zombies_direction()
-				break
-	def _change_zombies_direction(self):
-		for zombie in self.zombies.sprites():
-			zombie.rect.x -= self.settings.zombies_drop_speed
-		self.settings.zombies_direction *= -1
 
 	def _create_zombiehand_group(self):
 	    for i in range(10):
@@ -142,7 +133,6 @@ class ZombieShooter():
 	                break
 	                
 	        self.zombiehands.add(zombiehand)
-
 
 
 	def _update_screen(self):
