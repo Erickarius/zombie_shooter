@@ -9,6 +9,14 @@ from settings_zombie_shooter import Settings
 from soldier_bullet import Bullet
 from zombie import Zombie
 from zombie_hand import ZombieHand
+from time import sleep
+import math
+
+ZOMBIES_IN_ROW = 6
+ZOMBIES_IN_COLUMN = 6
+CLEAR_AREA_X = 400
+CLEAR_AREA_Y = 400
+SLOW = 0.01
 
 class ZombieShooter():
 
@@ -31,13 +39,13 @@ class ZombieShooter():
 		self._create_zombiehand_group()
 
 	def run_game(self):
-
 		while True: 
 			self._check_screen()
 			self.soldier.update()
 			self._update_bullets()
 			self._update_zombies()
 			self._update_screen()
+			sleep(SLOW)
 
 	def _check_screen(self):
 		for event in pygame.event.get():
@@ -91,29 +99,16 @@ class ZombieShooter():
 		self.zombies.update()
 
 	def _create_zombie_group(self):
-	    zombie = Zombie(self)
-	    zombie_width, zombie_height = zombie.rect.size
+		scr_w = self.settings.screen_width
+		scr_h = self.settings.screen_height
+		for x_pos in range(scr_w, CLEAR_AREA_X, -math.ceil((scr_w - CLEAR_AREA_X)/ZOMBIES_IN_ROW)):
+			for y_pos in range(0, scr_h - CLEAR_AREA_Y, math.ceil((scr_h - CLEAR_AREA_Y)/ZOMBIES_IN_COLUMN)):
+				self._create_zombie(x_pos, y_pos)
 
-	    available_space_x = self.settings.screen_width - (2 * zombie_width)
-	    number_zombies_x = available_space_x // (2 * zombie_height)
-	    
-	    soldier_width = self.soldier.rect.height
-	    available_space_y = (self.settings.screen_width- (2 * zombie_width)
-	                         - soldier_width)
 
-	    number_row = available_space_y // (2 * zombie_width)
-
-	    for row_number in range(number_row):
-	        for zombie_number in range(number_zombies_x):
-	            self._create_zombie(zombie_number, row_number)
-
-	def _create_zombie(self, zombie_number, row_number):
-	    zombie = Zombie(self)
-	    zombie_height = zombie.rect.height
-	    zombie.x = self.settings.screen_width - (zombie_height + 2 * zombie_height * zombie_number)
-	    zombie.rect.x = zombie.x
-	    zombie.rect.y = zombie.rect.height + 2 * zombie.rect.height * row_number
-	    self.zombies.add(zombie)
+	def _create_zombie(self, x, y):
+		zombie = Zombie(self, x, y)
+		self.zombies.add(zombie)
 
 	def _check_group_edges(self):
 		for zombie in self.zombies.sprites():
@@ -123,7 +118,7 @@ class ZombieShooter():
 
 	def _change_group_direction(self):
 		for zombie in self.zombies.sprites():
-			zombie.rect.y += self.settings.zombies_drop_speed
+			zombie.update_x(-self.settings.zombies_drop_speed)
 		self.settings.zombies_direction *= -1
 
 	def _create_zombiehand_group(self):
