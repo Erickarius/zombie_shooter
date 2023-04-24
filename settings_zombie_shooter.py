@@ -14,4 +14,4 @@ class Settings:
 
 		self.zombie_speed = 1
 		self.zombies_drop_speed = 10
-		self.zombies_direction = -1
+		self.zombies_direction = 1
