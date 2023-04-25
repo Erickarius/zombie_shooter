@@ -4,19 +4,13 @@ import pygame
 
 import random
 
+import math
+
 from soldier import Soldier
 from settings_zombie_shooter import Settings
 from soldier_bullet import Bullet
 from zombie import Zombie
 from zombie_hand import ZombieHand
-from time import sleep
-import math
-
-ZOMBIES_IN_ROW = 6
-ZOMBIES_IN_COLUMN = 6
-CLEAR_AREA_X = 400
-CLEAR_AREA_Y = 400
-SLOW = 0.01
 
 class ZombieShooter():
 
@@ -45,7 +39,6 @@ class ZombieShooter():
 			self._update_bullets()
 			self._update_zombies()
 			self._update_screen()
-			sleep(SLOW)
 
 	def _check_screen(self):
 		for event in pygame.event.get():
@@ -101,8 +94,14 @@ class ZombieShooter():
 	def _create_zombie_group(self):
 		scr_w = self.settings.screen_width
 		scr_h = self.settings.screen_height
-		for x_pos in range(scr_w, CLEAR_AREA_X, -math.ceil((scr_w - CLEAR_AREA_X)/ZOMBIES_IN_ROW)):
-			for y_pos in range(0, scr_h - CLEAR_AREA_Y, math.ceil((scr_h - CLEAR_AREA_Y)/ZOMBIES_IN_COLUMN)):
+		clear_area_x = self.settings.clear_area_x
+		clear_area_y = self.settings.clear_area_y
+		zombies_in_row = self.settings.zombies_in_row
+		zombies_in_column = self.settings.zombies_in_column
+		for x_pos in range(self.settings.screen_width, clear_area_x, -math.ceil(
+			(scr_w - clear_area_x)/zombies_in_row)):
+			for y_pos in range(0, self.settings.screen_height - clear_area_y, 
+				math.ceil((scr_h - clear_area_y )/zombies_in_column)):
 				self._create_zombie(x_pos, y_pos)
 
 

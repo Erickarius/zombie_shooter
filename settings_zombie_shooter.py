@@ -12,6 +12,10 @@ class Settings:
 		self.bullet_color = (60, 60, 60)
 		self.bullets_allowed = 5
 
+		self.zombies_in_row = 6
+		self.zombies_in_column = 4
+		self.clear_area_x = 400
+		self.clear_area_y = 100
 		self.zombie_speed = 1
 		self.zombies_drop_speed = 10
 		self.zombies_direction = 1
