@@ -1,13 +1,15 @@
 import sys
+from time import sleep
 
 import pygame
 
 import random
 
-import math
 
-from soldier import Soldier
 from settings_zombie_shooter import Settings
+from game_stats import GameStats
+from button import Button
+from soldier import Soldier
 from soldier_bullet import Bullet
 from zombie import Zombie
 from zombie_hand import ZombieHand
@@ -23,24 +25,30 @@ class ZombieShooter():
 			self.settings.screen_height))
 		pygame.display.set_caption("Zombie Schooter")
 
+		self.stats = GameStats(self)
+
 		self.soldier = Soldier(self)
 		self.bullets = pygame.sprite.Group()
 
 		self.zombies = pygame.sprite.Group() 
-		self.zombiehands = pygame.sprite.Group()
+		self.zombiehands = pygame.sprite.Group() 
 
 		self._create_zombie_group()
 		self._create_zombiehand_group()
+		self.play_button = Button(self, self.screen, msg="Start")
 
 	def run_game(self):
 		while True: 
-			self._check_screen()
-			self.soldier.update()
-			self._update_bullets()
-			self._update_zombies()
+			self._check_events()
+
+			if self.stats.game_active:
+				self.soldier.update()
+				self._update_bullets()
+				self._update_zombies()
+
 			self._update_screen()
 
-	def _check_screen(self):
+	def _check_events(self):
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				sys.exit()
@@ -48,6 +56,23 @@ class ZombieShooter():
 				self._check_keydown_events(event)
 			elif event.type == pygame.KEYUP:
 				self._check_keyup_events(event)
+			elif event.type == pygame.MOUSEBUTTONDOWN:
+				mouse_pos = pygame.mouse.get_pos()
+				self._check_play_button(mouse_pos)
+
+	def _check_play_button(self, mouse_pos):
+		button_clicked = self.play_button.rect.collidepoint(mouse_pos)
+		if button_clicked and not self.stats.game_active:
+			self.stats.reset_stats()
+			self.stats.game_active = True
+
+			self.zombies.empty()
+			self.bullets.empty()
+
+			self._create_zombie_group()
+			self.soldier.center_soldier()
+
+			pygame.mouse.set_visible(False)
 
 	def _check_keydown_events(self, event):
 		
@@ -88,21 +113,55 @@ class ZombieShooter():
 			if bullet.rect.right > 1200:
 				self.bullets.remove(bullet)
 
+		self._check_bullet_zombie_collisions()
+
+	def _check_bullet_zombie_collisions(self):
+
+		collisions = pygame.sprite.groupcollide(self.bullets, self.zombies, 
+			True, True)
+
+		if not self.zombies:
+			self.bullets.empty()
+			self._create_zombie_group()
+
 	def _update_zombies(self):
 		self.zombies.update()
 
+		if pygame.sprite.spritecollideany(self.soldier, self.zombies):
+			self._soldier_hit()
+
+		self._check_zombies_left()
+	
+	def _soldier_hit(self):
+		if self.stats.soldier_left > 0:
+			self.stats.soldier_left -= 1
+			self.zombies.empty()
+			self.bullets.empty()
+			self._create_zombie_group()
+			self.soldier.center_soldier()
+			sleep(0.5)
+		else:
+			self.stats.game_active = False
+			pygame.mouse.set_visible(True)
+
+	def _check_zombies_left(self):
+		screen_rect = self.screen.get_rect()
+		for zombie in self.zombies.sprites():
+			if zombie.rect.left <= screen_rect.left:
+				self._soldier_hit()
+				break
+
 	def _create_zombie_group(self):
-		scr_w = self.settings.screen_width
-		scr_h = self.settings.screen_height
-		clear_area_x = self.settings.clear_area_x
-		clear_area_y = self.settings.clear_area_y
-		zombies_in_row = self.settings.zombies_in_row
-		zombies_in_column = self.settings.zombies_in_column
-		for x_pos in range(self.settings.screen_width, clear_area_x, -math.ceil(
-			(scr_w - clear_area_x)/zombies_in_row)):
-			for y_pos in range(0, self.settings.screen_height - clear_area_y, 
-				math.ceil((scr_h - clear_area_y )/zombies_in_column)):
-				self._create_zombie(x_pos, y_pos)
+		scr_w, scr_h = self.settings.screen_width, self.settings.screen_height
+		clear_area_x, clear_area_y = self.settings.clear_area_x, self.settings.clear_area_y
+		zombies_in_row, zombies_in_column = self.settings.zombies_in_row, self.settings.zombies_in_column
+
+		for x_pos in range(scr_w, clear_area_x, -(
+			(scr_w - clear_area_x) // zombies_in_row)):
+		    
+		    for y_pos in range(0, scr_h - clear_area_y, 
+		    	(scr_h - clear_area_y) // zombies_in_column):
+		        self._create_zombie(x_pos, y_pos)
 
 
 	def _create_zombie(self, x, y):
@@ -121,22 +180,20 @@ class ZombieShooter():
 		self.settings.zombies_direction *= -1
 
 	def _create_zombiehand_group(self):
-	    for i in range(10):
-	        zombiehand = ZombieHand(self)
-	        zombiehand_width, zombiehand_height = zombiehand.rect.size
-	        
-	        while True:
-	            zombiehand.x = random.randint(zombiehand_width, 
-	                self.settings.screen_width - zombiehand_width)
-	            zombiehand.rect.x = zombiehand.x
-	            zombiehand.rect.y = random.randint(zombiehand_height, 
-	                self.settings.screen_height - zombiehand_height)
-	                
-	            # Sprawdź, czy nowo wylosowana pozycja koliduje z innym obiektem
-	            if not pygame.sprite.spritecollide(zombiehand, self.zombies, False) and not pygame.sprite.spritecollide(zombiehand, self.zombiehands, False):
-	                break
-	                
-	        self.zombiehands.add(zombiehand)
+		for _ in range(10):
+			zombiehand = ZombieHand(self)
+			zombiehand_width, zombiehand_height = zombiehand.rect.size
+
+			while True:
+			    zombiehand.x = random.randint(zombiehand_width, 
+			    	self.settings.screen_width - zombiehand_width)
+			    zombiehand.rect.x, zombiehand.rect.y = zombiehand.x, random.randint(
+			    	zombiehand_height, self.settings.screen_height - zombiehand_height)
+			    if not pygame.sprite.spritecollide(zombiehand, self.zombies, 
+			    	False) and not pygame.sprite.spritecollide(zombiehand, self.zombiehands, False):
+			        break
+			        
+			self.zombiehands.add(zombiehand)
 
 
 	def _update_screen(self):
@@ -144,6 +201,9 @@ class ZombieShooter():
 		self.zombiehands.draw(self.screen)
 		self.zombies.draw(self.screen)
 		self.soldier.blitme()
+
+		if not self.stats.game_active:
+			self.play_button.draw_button()
 
 		for bullet in self.bullets.sprites():
 			bullet.draw_bullet()

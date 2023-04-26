@@ -37,3 +37,7 @@ class Soldier():
 
 	def blitme(self):
 		self.screen.blit(self.image, self.rect)
+
+	def center_soldier(self):
+		self.rect.bottomleft = self.screen_rect.bottomleft
+		self.x = float(self.rect.x)
