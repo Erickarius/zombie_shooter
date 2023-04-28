@@ -14,6 +14,7 @@ from soldier import Soldier
 from bullet import Bullet
 from zombie import Zombie
 from zombie_hand import ZombieHand
+from raindrop import Raindrop
 
 class ZombieShooter():
 
@@ -31,12 +32,14 @@ class ZombieShooter():
 
 		self.soldier = Soldier(self)
 		self.bullets = pygame.sprite.Group()
+		self.rain = pygame.sprite.Group()
 
 		self.zombies = pygame.sprite.Group() 
 		self.zombiehands = pygame.sprite.Group() 
 
 		self._create_zombie_group()
 		self._create_zombiehand_group()
+		self._create_rain()
 		self.play_button = Button(self, self.screen, msg="Start")
 
 	def run_game(self):
@@ -44,6 +47,7 @@ class ZombieShooter():
 			self._check_events()
 
 			if self.stats.game_active:
+				self._rain_update()
 				self.soldier.update()
 				self._update_bullets()
 				self._update_zombies()
@@ -211,9 +215,36 @@ class ZombieShooter():
 			        
 			self.zombiehands.add(zombiehand)
 
+	def _create_rain(self):
+	    scr_w, scr_h = self.settings.screen_width, self.settings.screen_height
+	    clear_rain_area_x, clear_rain_area_y = self.settings.clear_rain_area_x, self.settings.clear_rain_area_y
+	    raindrop_in_row, raindrop_in_column = self.settings.raindrop_in_row, self.settings.raindrop_in_column
+
+	    for x_pos in range(scr_w, clear_rain_area_x, -(
+	        (scr_w - clear_rain_area_x) // raindrop_in_row)):
+
+	        for y_pos in range(0, scr_h - clear_rain_area_y,
+	            (scr_h - clear_rain_area_y) // raindrop_in_column):
+	            self._create_raindrop(x_pos, y_pos)
+
+
+	def _create_raindrop(self, x, y):
+	    raindrop = Raindrop(self, x, y)
+	    self.rain.add(raindrop)
+
+	def _rain_update(self):
+		self.rain.update()
+
+		for raindrop in self.rain.copy():
+			if raindrop.rect.bottom >= self.settings.screen_height:
+				self.rain.remove(raindrop)
+
+		if len(self.rain) == 0:
+			self._create_rain()
 
 	def _update_screen(self):
 		self.screen.fill(self.settings.bg_color)
+		self.rain.draw(self.screen)
 		self.zombiehands.draw(self.screen)
 		self.zombies.draw(self.screen)
 		self.soldier.blitme()

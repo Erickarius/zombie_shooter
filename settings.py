@@ -21,6 +21,13 @@ class Settings:
 		self.clear_area_y = 100
 		self.zombies_drop_speed = 10
 
+		#raindrop settings
+		self.rain_speed = 0.5
+		self.clear_rain_area_x = 5
+		self.clear_rain_area_y = 10
+		self.raindrop_in_row = 10
+		self.raindrop_in_column = 5
+
 		#Easy game speed change
 		self.speedup_scale = 1.1
 

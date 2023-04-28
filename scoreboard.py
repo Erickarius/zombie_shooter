@@ -58,7 +58,7 @@ class Scoreboard:
 		self.soldiers = Group()
 		for soldier_number in range(self.stats.soldier_left):
 			soldier = Soldier(self.zs_game)
-			soldier.rect.x = 10 + soldier_number * soldier.rect.width
+			soldier.rect.x = self.high_score_rect.left - 150 - (10 + soldier_number * soldier.rect.width)
 			soldier.rect.y = 10
 			self.soldiers.add(soldier)
 
