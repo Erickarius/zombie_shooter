@@ -1,9 +1,10 @@
 import pygame
+from pygame.sprite import Sprite
 
-class Soldier():
+class Soldier(Sprite):
 
 	def __init__(self, zs_game):
-
+		super().__init__()
 		self.screen = zs_game.screen
 		self.settings = zs_game.settings
 		self.screen_rect = zs_game.screen.get_rect()
