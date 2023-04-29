@@ -35,7 +35,8 @@ class Button():
 	
 	def _prep_msg2(self, msg):
 
-		self.msg2_image = self.font.render(msg, True, self.text_color, self.button_color)
+		self.msg2_image = self.font.render(msg, True, self.text_color, 
+			self.button_color)
 		self.msg2_image_rect = self.msg2_image.get_rect()
 		self.msg2_image_rect.center = self.rect2.center
 
@@ -54,7 +55,8 @@ class Button():
 	        ("Start Game: G", self.screen.get_rect().centery + 60)
 	    ]
 	    for message, y in texts:
-	        text = font.render(message, True, (255, 255, 255), self.settings.bg_color)
+	        text = font.render(message, True, (255, 255, 255), 
+	        	self.settings.bg_color)
 	        text_rect = text.get_rect()
 	        text_rect.center = (self.screen.get_rect().centerx, y)
 	        self.screen.blit(text, text_rect)
@@ -65,7 +67,7 @@ class Button():
 	        for event in pygame.event.get():
 	            if event.type == pygame.MOUSEBUTTONUP:
 	                self.draw_button()
-	                sleep(5)
+	                sleep(3)
 	                return
 
 

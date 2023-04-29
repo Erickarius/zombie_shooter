@@ -15,6 +15,7 @@ from bullet import Bullet
 from zombie import Zombie
 from zombie_hand import ZombieHand
 from raindrop import Raindrop
+from sound import Sound
 
 class ZombieShooter():
 
@@ -33,6 +34,7 @@ class ZombieShooter():
 		self.soldier = Soldier(self)
 		self.bullets = pygame.sprite.Group()
 		self.rain = pygame.sprite.Group()
+		self.sound = Sound()
 
 		self.zombies = pygame.sprite.Group() 
 		self.zombiehands = pygame.sprite.Group() 
@@ -108,6 +110,7 @@ class ZombieShooter():
 			self.stats.save_high_score()
 			sys.exit()
 		elif event.key == pygame.K_SPACE:
+			self.sound.shot.play() 
 			self._fire_bullet()
 		elif event.key == pygame.K_g:
 			self._start_game()
@@ -145,6 +148,7 @@ class ZombieShooter():
 		if collisions:
 			for zombies in collisions.values():
 				self.stats.score += self.settings.zombie_points * len(zombies)
+			self.sound.zombie_dead.play() 
 			self.sb.prep_score()
 			self.sb.check_high_score()
 
@@ -167,6 +171,7 @@ class ZombieShooter():
 	def _soldier_hit(self):
 		if self.stats.soldier_left > 0:
 			self.stats.soldier_left -= 1
+			self.sound.soldier_dead.play()
 			self.sb.prep_soldiers()
 			self.zombies.empty()
 			self.bullets.empty()
