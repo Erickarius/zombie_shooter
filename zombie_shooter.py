@@ -57,6 +57,7 @@ class ZombieShooter():
 	def _check_events(self):
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
+				self.stats.save_high_score()
 				sys.exit()
 			elif event.type == pygame.KEYDOWN:
 				self._check_keydown_events(event)
@@ -66,23 +67,29 @@ class ZombieShooter():
 				mouse_pos = pygame.mouse.get_pos()
 				self._check_play_button(mouse_pos)
 
+	def _start_game(self):
+	    if not self.stats.game_active:
+	        self._reset_game()
+	        self.stats.game_active = True
+	        pygame.mouse.set_visible(False)
+
 	def _check_play_button(self, mouse_pos):
-		button_clicked = self.play_button.rect.collidepoint(mouse_pos)
-		if button_clicked and not self.stats.game_active:
-			self.settings.initalize_dynamic_settings()
-			self.stats.reset_stats()
-			self.stats.game_active = True
-			self.sb.prep_score()
-			self.sb.prep_level()
-			self.sb.prep_soldiers()
+	    if self.play_button.rect.collidepoint(mouse_pos):
+	        self._start_game()
 
-			self.zombies.empty()
-			self.bullets.empty()
+	def _reset_game(self):
+	    self.settings.initalize_dynamic_settings()
+	    self.stats.reset_stats()
+	    self.sb.prep_score()
+	    self.sb.prep_level()
+	    self.sb.prep_soldiers()
 
-			self._create_zombie_group()
-			self.soldier.center_soldier()
+	    self.zombies.empty()
+	    self.bullets.empty()
 
-			pygame.mouse.set_visible(False)
+	    self._create_zombie_group()
+	    self.soldier.center_soldier()
+
 
 	def _check_keydown_events(self, event):
 		
@@ -95,9 +102,12 @@ class ZombieShooter():
 		elif event.key == pygame.K_s:
 			self.soldier.moving_down = True
 		elif event.key == pygame.K_ESCAPE:
+			self.stats.save_high_score()
 			sys.exit()
 		elif event.key == pygame.K_SPACE:
 			self._fire_bullet()
+		elif event.key == pygame.K_g:
+			self._start_game()
 
 	def _check_keyup_events(self, event):
 		
