@@ -40,7 +40,8 @@ class ZombieShooter():
 		self._create_zombie_group()
 		self._create_zombiehand_group()
 		self._create_rain()
-		self.play_button = Button(self, self.screen, msg="Start")
+		self.button = Button(self, self.screen, msg="Start", msg2 = "Controls")
+	
 
 	def run_game(self):
 		while True: 
@@ -65,7 +66,7 @@ class ZombieShooter():
 				self._check_keyup_events(event)
 			elif event.type == pygame.MOUSEBUTTONDOWN:
 				mouse_pos = pygame.mouse.get_pos()
-				self._check_play_button(mouse_pos)
+				self._check_button(mouse_pos)
 
 	def _start_game(self):
 	    if not self.stats.game_active:
@@ -73,9 +74,11 @@ class ZombieShooter():
 	        self.stats.game_active = True
 	        pygame.mouse.set_visible(False)
 
-	def _check_play_button(self, mouse_pos):
-	    if self.play_button.rect.collidepoint(mouse_pos):
+	def _check_button(self, mouse_pos):
+	    if self.button.rect.collidepoint(mouse_pos):
 	        self._start_game()
+	    elif self.button.rect2.collidepoint(mouse_pos):
+	    	self.button.show_control()
 
 	def _reset_game(self):
 	    self.settings.initalize_dynamic_settings()
@@ -262,7 +265,8 @@ class ZombieShooter():
 		self.sb.show_score()
 
 		if not self.stats.game_active:
-			self.play_button.draw_button()
+			self.button.draw_button()
+			self.button.draw_button2()
 
 		for bullet in self.bullets.sprites():
 			bullet.draw_bullet()
