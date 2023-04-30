@@ -8,21 +8,22 @@ class Raindrop(Sprite):
         self.screen = zs_game.screen
         self.settings = zs_game.settings
 
+        # Load the image of the raindrop and set its position
         self.image = pygame.image.load('images/raindrop.bmp')
         self.rect = self.image.get_rect()
-        self.y = y
-        self.x = x - self.rect.width
+        self.rect.x = x - self.rect.width
+        self.rect.y = y
 
-        self.rect.x = self.x
-        self.rect.y = self.y
+        # Initialize the x and y positions of the raindrop
+        self.x = self.rect.x
+        self.y = self.rect.y
 
     def update(self):
-        self.update_y(self.settings.rain_speed)
-
-    def update_y(self, y):
-        self.y += y
+        # Update the y position of the raindrop based on the rain speed setting
+        self.y += self.settings.rain_speed
         self.rect.y = self.y
 
     def update_x(self, x):
+        # Update the x position of the raindrop
         self.x += x
         self.rect.x += x
